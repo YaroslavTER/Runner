@@ -33,6 +33,7 @@ function RunGame(){
             Jump()
             Draw()
             RunEnemies()
+            IsCollision()
         }
     },time)
 }
@@ -42,8 +43,21 @@ function Jump(){
         userBlock.y += jumpCoef
         isJump = userBlock.y < userBlock.height*2 +
                                userBlock.height/2 ? true : false
-    } else if(!isJump && userBlock.y > 0)
-        userBlock.y -= jumpCoef
+    } else if(!isJump && userBlock.y > 0){
+        if(!IsCollision())
+            userBlock.y -= jumpCoef
+    }
+}
+
+function IsCollision(){
+    var isCollision = false
+    for(var enemy of enemies){
+        if(userBlock.y == enemy.y + enemy.height && 
+           userBlock.x >= enemy.x - enemy.height &&
+           userBlock.x <= enemy.x + enemy.height)
+            isCollision = true
+    }
+    return isCollision
 }
 
 function Draw(){
@@ -68,7 +82,7 @@ function DrawBlock(inputBlock, color){
 function RunEnemies(){
     for(var enemy of enemies){
         enemy.x--
-        if(enemy.x == 0){
+        if(enemy.x == -height){
             enemy.x = GenerateDistance()
             console.log(enemy.x)
         }
@@ -96,7 +110,7 @@ Draw()
 
 document.addEventListener('keydown', function(event) {
     var keycode = (event.keyCode ? event.keyCode : event.which)
-    if(event.which == 32 && userBlock.y == 0){
+    if(event.which == 32 && (userBlock.y == 0 || IsCollision())){
         if(!isBegin){
             RunGame()
             isBegin = true
