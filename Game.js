@@ -6,15 +6,22 @@ const GRAY = "#474747"
 const DARK_GRAY = "#303030"
 
 var defBlockHeight = 30
+var userBlock = {x: 0, y: 0, color: GRAY, height: defBlockHeight}
 
-var userBlock = {x: 0, y: 0, height: defBlockHeight}
-var jumpCoef = 2, isJump = false
+var jumpCoef = 2.5, isJump = false
+var jumpLimit = userBlock.height*2 + userBlock.height
+var jumpLimit_ = jumpLimit + defBlockHeight
+var limitIsChanged = false
+
 var time = 1
 var middle = width/2-userBlock.height
 
 var mainGameCycle
 var isBegin = false
 var run = false
+var runCounter = 0
+var score = 0
+
 var platform = {height: 2.5, width: width}
 
 var enemies = []
@@ -22,18 +29,22 @@ var minDistance = 1, maxDistance = 50
 
 function RunGame(){
     mainGameCycle = setInterval(function(){
-        console.log("x: ", userBlock.x, "y: ", userBlock.y)
-        if(userBlock.x < middle){
-            userBlock.x++
-            Jump()
-            Draw()
-            if(userBlock.x + 1 == middle)
-                GenerateEnemies()
-        } if(userBlock.x == middle){
-            Jump()
-            Draw()
-            RunEnemies()
-            IsCollision()
+        if(runCounter == 1){
+            if(userBlock.x < middle){
+                userBlock.x++
+                Jump()
+                Draw()
+                console.log("jumpLimit: ", jumpLimit)
+                if(userBlock.x + 1 == middle)
+                    GenerateEnemies()
+            } if(userBlock.x == middle){
+                Jump()
+                Draw()
+                RunEnemies()
+                IsCollision()
+                isSideCollision()
+                console.log("jumpLimit: ", jumpLimit)
+            }
         }
     },time)
 }
@@ -41,23 +52,46 @@ function RunGame(){
 function Jump(){
     if(isJump){
         userBlock.y += jumpCoef
-        isJump = userBlock.y < userBlock.height*2 +
-                               userBlock.height/2 ? true : false
+        isJump = userBlock.y < jumpLimit ? true : false
     } else if(!isJump && userBlock.y > 0){
-        if(!IsCollision())
+        if(!IsCollision()){
             userBlock.y -= jumpCoef
+            if(limitIsChanged){
+                jumpLimit -= defBlockHeight
+                limitIsChanged = false
+            }
+        }
     }
 }
 
 function IsCollision(){
     var isCollision = false
     for(var enemy of enemies){
-        if(userBlock.y == enemy.y + enemy.height && 
+        if(userBlock.y == enemy.y + enemy.height &&
            userBlock.x >= enemy.x - enemy.height &&
-           userBlock.x <= enemy.x + enemy.height)
+           userBlock.x <= enemy.x + enemy.height){
             isCollision = true
+            if(!limitIsChanged){
+                jumpLimit += defBlockHeight
+                limitIsChanged = true
+            }
+            score += 0.5
+            document.getElementById('scoreId').innerHTML = '' + score
+            console.log("on box")
+        }
     }
     return isCollision
+}
+
+function isSideCollision(){
+    for(var enemy of enemies){
+        if(userBlock.x == enemy.x - enemy.height + 1 &&
+            userBlock.y >= enemy.y - enemy.height + 1 &&
+            userBlock.y <= enemy.y + enemy.height - 1){
+            runCounter++
+            console.log("side collision")
+        }
+    }
 }
 
 function Draw(){
@@ -84,7 +118,6 @@ function RunEnemies(){
         enemy.x--
         if(enemy.x == -height){
             enemy.x = GenerateDistance()
-            console.log(enemy.x)
         }
     }
 }
@@ -111,9 +144,9 @@ Draw()
 document.addEventListener('keydown', function(event) {
     var keycode = (event.keyCode ? event.keyCode : event.which)
     if(event.which == 32 && (userBlock.y == 0 || IsCollision())){
-        if(!isBegin){
+        if(runCounter == 0){
             RunGame()
-            isBegin = true
+            runCounter++
         } else isJump = true
     }
 })
