@@ -10,7 +10,6 @@ var userBlock = {x: 0, y: 0, color: GRAY, height: defBlockHeight}
 
 var jumpCoef = 2.5, isJump = false
 var jumpLimit = userBlock.height*2 + userBlock.height/2
-var jumpLimit_ = jumpLimit + defBlockHeight
 var limitIsChanged = false
 
 var time = 1
