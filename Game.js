@@ -75,7 +75,7 @@ function IsCollision(){
                 limitIsChanged = true
             }
             score += 0.5
-            document.getElementById('scoreId').innerHTML = '' + score
+            document.getElementById("scoreId").innerHTML = "" + score
             console.log("on box")
         }
     }
