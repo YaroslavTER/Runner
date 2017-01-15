@@ -9,7 +9,7 @@ var defBlockHeight = 30
 var userBlock = {x: 0, y: 0, color: GRAY, height: defBlockHeight}
 
 var jumpCoef = 2.5, isJump = false
-var jumpLimit = userBlock.height*2 + userBlock.height
+var jumpLimit = userBlock.height*2 + userBlock.height/2
 var jumpLimit_ = jumpLimit + defBlockHeight
 var limitIsChanged = false
 
@@ -68,8 +68,8 @@ function IsCollision(){
     var isCollision = false
     for(var enemy of enemies){
         if(userBlock.y == enemy.y + enemy.height &&
-           userBlock.x >= enemy.x - enemy.height &&
-           userBlock.x <= enemy.x + enemy.height){
+           userBlock.x >= enemy.x - enemy.height + 1 &&
+           userBlock.x <= enemy.x + enemy.height - 1){
             isCollision = true
             if(!limitIsChanged){
                 jumpLimit += defBlockHeight
@@ -97,7 +97,9 @@ function isSideCollision(){
 function Draw(){
     ctx.clearRect(0, 0, width, height)
 
-    DrawBlock(userBlock, GRAY)
+    ctx.fillStyle = userBlock.color
+    ctx.fillRect(userBlock.x, height/2-userBlock.y,
+                 userBlock.height, userBlock.height)
 
     for(var enemy of enemies)
         DrawBlock(enemy, GRAY)
