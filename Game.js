@@ -46,8 +46,9 @@ function RunGame(){
                 RunEnemies()
                 IsCollision()
                 isSideCollision()
-                if(userBlock.y == 0 && userBlock.x%2 == 0)
-                    userBlock.color = DecrementColorValue(userBlock.color)
+                if(userBlock.y == 0 && userBlock.x % 2 == 0 &&
+                                       userBlock.color > MIN_VALUE)
+                    userBlock.color--
                 console.log("jumpLimit: ", jumpLimit)
             }
         }
@@ -81,25 +82,13 @@ function IsCollision(){
                 limitIsChanged = true
             }
             score += 0.5
-            if(userBlock.x%2 == 0)
-                userBlock.color = IncrementColorValue(userBlock.color)
+            if(userBlock.x % 2 == 0 && userBlock.color < MAX_VALUE)
+                userBlock.color++
             document.getElementById("scoreId").innerHTML = "" + score
             console.log("on box")
         }
     }
     return isCollision
-}
-
-function IncrementColorValue(colorValue){
-    if(colorValue < MAX_VALUE)
-        colorValue++
-    return colorValue
-}
-
-function DecrementColorValue(colorValue){
-    if(colorValue > MIN_VALUE)
-        colorValue--
-    return colorValue
 }
 
 function isSideCollision(){
