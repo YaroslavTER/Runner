@@ -2,9 +2,8 @@ var canvas = document.getElementById('canvasId')
 var ctx = canvas.getContext('2d')
 var height = canvas.clientHeight, width = canvas.clientWidth
 
-const RED = "#ff0000"
-const GRAY = "#474747"
-const DARK_GRAY = "#303030"
+const GRAY = "rgb(71,71,71)"
+const DARK_GRAY = "rgb(48,48,48)"
 
 const MIN_VALUE = 71
 const MAX_VALUE = 255
@@ -13,11 +12,11 @@ var defBlockHeight = 30
 var userBlock = {x: 0, y: 0, color: MIN_VALUE, height: defBlockHeight}
 
 var jumpCoef = 2.5, isJump = false
-var jumpLimit = userBlock.height*2 + userBlock.height/2
+var jumpLimit = userBlock.height * 2 + userBlock.height / 2
 var limitIsChanged = false
 
 var time = 1
-var middle = width/2 - userBlock.height
+var middle = width / 2 - userBlock.height
 
 var mainGameCycle
 var isBegin = false
