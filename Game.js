@@ -2,18 +2,22 @@ var canvas = document.getElementById('canvasId')
 var ctx = canvas.getContext('2d')
 var height = canvas.clientHeight, width = canvas.clientWidth
 
+const RED = "#ff0000"
 const GRAY = "#474747"
 const DARK_GRAY = "#303030"
 
+const MIN_VALUE = 71
+const MAX_VALUE = 255
+
 var defBlockHeight = 30
-var userBlock = {x: 0, y: 0, color: GRAY, height: defBlockHeight}
+var userBlock = {x: 0, y: 0, color: MIN_VALUE, height: defBlockHeight}
 
 var jumpCoef = 2.5, isJump = false
 var jumpLimit = userBlock.height*2 + userBlock.height/2
 var limitIsChanged = false
 
 var time = 1
-var middle = width/2-userBlock.height
+var middle = width/2 - userBlock.height
 
 var mainGameCycle
 var isBegin = false
@@ -75,6 +79,7 @@ function IsCollision(){
                 limitIsChanged = true
             }
             score += 0.5
+            ChangeColor()
             document.getElementById("scoreId").innerHTML = "" + score
             console.log("on box")
         }
@@ -82,11 +87,34 @@ function IsCollision(){
     return isCollision
 }
 
+function ChangeColor(){
+    if(userBlock.y == 0)//on floor
+        userBlock.color = DecrementColorValue(userBlock.color)
+    else {
+        if(score%2 == 0)
+            userBlock.color = IncrementColorValue(userBlock.color)
+    }
+}
+
+function IncrementColorValue(colorValue){
+    if(colorValue < MAX_VALUE)
+        colorValue++
+    else if(colorValue == MAX_VALUE)
+        colorValue = MIN_VALUE
+    return colorValue
+}
+
+function DecrementColorValue(colorValue){
+    if(colorValue > MIN_VALUE)
+        colorValue--
+    return colorValue
+}
+
 function isSideCollision(){
     for(var enemy of enemies){
         if(userBlock.x == enemy.x - enemy.height + 1 &&
-            userBlock.y >= enemy.y - enemy.height + 1 &&
-            userBlock.y <= enemy.y + enemy.height - 1){
+           userBlock.y >= enemy.y - enemy.height + 1 &&
+           userBlock.y <= enemy.y + enemy.height - 1){
             runCounter++
             console.log("side collision")
         }
@@ -96,7 +124,7 @@ function isSideCollision(){
 function Draw(){
     ctx.clearRect(0, 0, width, height)
 
-    ctx.fillStyle = userBlock.color
+    ctx.fillStyle = "rgb(" + userBlock.color + ", 71, 71)"
     ctx.fillRect(userBlock.x, height/2-userBlock.y,
                  userBlock.height, userBlock.height)
 
@@ -142,7 +170,7 @@ function GetRandInRange(min, max){
 
 Draw()
 
-document.addEventListener('keydown', function(event) {
+document.addEventListener('keydown', function(event){
     var keycode = (event.keyCode ? event.keyCode : event.which)
     if(event.which == 32 && (userBlock.y == 0 || IsCollision())){
         if(runCounter == 0){
