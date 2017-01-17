@@ -82,6 +82,10 @@ function IsCollision(){
     return isCollision
 }
 
+function ChangeColor(){
+    
+}
+
 function isSideCollision(){
     for(var enemy of enemies){
         if(userBlock.x == enemy.x - enemy.height + 1 &&
