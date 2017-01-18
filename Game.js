@@ -177,7 +177,8 @@ document.addEventListener('keydown', function(event) {
             console.log()
             RestartGame()
             runCounter = 1
-        } else if(userBlock.y == 0 || IsCollision()) isJump = true
+        } else if(userBlock.y == 0 || IsCollision())
+            isJump = true
         console.log("runCounter: ",runCounter)
         console.log("space")
     }
