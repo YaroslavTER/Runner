@@ -29,17 +29,17 @@ var platform = {height: 2.5, width: width}
 var enemies = []
 var minDistance = 1, maxDistance = 50
 
-function RunGame(){
-    mainGameCycle = setInterval(function(){
-        if(runCounter == 1){
-            if(userBlock.x < middle){
+function RunGame() {
+    mainGameCycle = setInterval(function() {
+        if(runCounter == 1) {
+            if(userBlock.x < middle) {
                 userBlock.x++
                 Jump()
                 Draw()
                 console.log("jumpLimit: ", jumpLimit)
                 if(userBlock.x + 1 == middle)
                     GenerateEnemies()
-            } if(userBlock.x == middle){
+            } if(userBlock.x == middle) {
                 Jump()
                 Draw()
                 RunEnemies()
@@ -54,14 +54,14 @@ function RunGame(){
     },time)
 }
 
-function Jump(){
-    if(isJump){
+function Jump() {
+    if(isJump) {
         userBlock.y += jumpCoef
         isJump = userBlock.y < jumpLimit ? true : false
-    } else if(!isJump && userBlock.y > 0){
-        if(!IsCollision()){
+    } else if(!isJump && userBlock.y > 0) {
+        if(!IsCollision()) {
             userBlock.y -= jumpCoef
-            if(limitIsChanged){
+            if(limitIsChanged) {
                 jumpLimit -= defBlockHeight
                 limitIsChanged = false
             }
@@ -69,14 +69,14 @@ function Jump(){
     }
 }
 
-function IsCollision(){
+function IsCollision() {
     var isCollision = false
-    for(var enemy of enemies){
+    for(var enemy of enemies) {
         if(userBlock.y == enemy.y + enemy.height &&
            userBlock.x >= enemy.x - enemy.height + 1 &&
-           userBlock.x <= enemy.x + enemy.height - 1){
+           userBlock.x <= enemy.x + enemy.height - 1) {
             isCollision = true
-            if(!limitIsChanged){
+            if(!limitIsChanged) {
                 jumpLimit += defBlockHeight
                 limitIsChanged = true
             }
@@ -90,18 +90,18 @@ function IsCollision(){
     return isCollision
 }
 
-function isSideCollision(){
-    for(var enemy of enemies){
+function isSideCollision() {
+    for(var enemy of enemies) {
         if(userBlock.x == enemy.x - enemy.height + 1 &&
            userBlock.y >= enemy.y - enemy.height + 1 &&
-           userBlock.y <= enemy.y + enemy.height - 1){
+           userBlock.y <= enemy.y + enemy.height - 1) {
             runCounter++
             console.log("side collision")
         }
     }
 }
 
-function Draw(){
+function Draw() {
     ctx.clearRect(0, 0, width, height)
 
     ctx.fillStyle = "rgb(" + userBlock.color + ", 71, 71)"
@@ -116,46 +116,70 @@ function Draw(){
                  platform.width, platform.height)
 }
 
-function DrawBlock(inputBlock, color){
+function DrawBlock(inputBlock, color) {
     ctx.fillStyle = color
     ctx.fillRect(inputBlock.x, height/2-inputBlock.y,
                  inputBlock.height, inputBlock.height)
 }
 
-function RunEnemies(){
-    for(var enemy of enemies){
+function RunEnemies() {
+    for(var enemy of enemies) {
         enemy.x--
-        if(enemy.x == -height){
+        if(enemy.x == -height) {
             enemy.x = GenerateDistance()
         }
     }
 }
 
-function GenerateEnemies(){
+function GenerateEnemies() {
     var numberOfEnemies = 5
     var enemyCounter = 0
-    while(enemyCounter < numberOfEnemies){
+    while(enemyCounter < numberOfEnemies) {
         enemies.push({x: GenerateDistance(), y: 0, height: defBlockHeight})
         enemyCounter++
     }
 }
 
-function GenerateDistance(){
+function GenerateDistance() {
     return width + defBlockHeight*GetRandInRange(minDistance, maxDistance)
 }
 
-function GetRandInRange(min, max){
+function GetRandInRange(min, max) {
     return Math.floor(Math.random() * (max - min + 1)) + min
+}
+
+function ClearEnemies() {
+    while(enemies.length > 0) {
+        enemies.pop()
+    }
+    console.log(enemies.length)
+}
+
+function RestartGame() {
+    score = 0
+    userBlock.x = 0
+    userBlock.y = 0
+    userBlock.color = MIN_VALUE
+    ClearEnemies()
+    clearInterval(mainGameCycle)
+    RunGame()
 }
 
 Draw()
 
-document.addEventListener('keydown', function(event){
+document.addEventListener('keydown', function(event) {
     var keycode = (event.keyCode ? event.keyCode : event.which)
-    if(event.which == 32 && (userBlock.y == 0 || IsCollision())){
-        if(runCounter == 0){
+    if(event.which == 32) {
+        if(runCounter == 0) {
             RunGame()
             runCounter++
-        } else isJump = true
+        } else if(runCounter == 2) {
+            console.log()
+            RestartGame()
+            runCounter = 1
+        } else if(userBlock.y == 0 || IsCollision()) isJump = true
+        console.log("runCounter: ",runCounter)
+        console.log("space")
     }
+    console.log(event.which)
 })
