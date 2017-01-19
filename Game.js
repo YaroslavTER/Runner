@@ -8,6 +8,8 @@ const DARK_GRAY = "rgb(48,48,48)"
 const MIN_VALUE = 71
 const MAX_VALUE = 255
 
+const MIN_ENEMIES_NUMBER = 5
+
 var defBlockHeight = 30
 var userBlock = {x: 0, y: 0, color: MIN_VALUE, height: defBlockHeight}
 
@@ -17,6 +19,7 @@ var limitIsChanged = false
 
 var time = 1
 var middle = width / 2 - userBlock.height
+var distanceTraveled = 0
 
 var mainGameCycle
 var isBegin = false
@@ -26,6 +29,7 @@ var score = 0
 
 var platform = {height: 2.5, width: width}
 
+var numberOfEnemies = MIN_ENEMIES_NUMBER, growCoef = 2
 var enemies = []
 var minDistance = 1, maxDistance = 50
 
@@ -33,25 +37,39 @@ function RunGame() {
     mainGameCycle = setInterval(function() {
         if(runCounter == 1) {
             if(userBlock.x < middle) {
-                userBlock.x++
-                Jump()
-                Draw()
-                console.log("jumpLimit: ", jumpLimit)
-                if(userBlock.x + 1 == middle)
-                    GenerateEnemies()
+                MovingBeforeMiddle()
             } if(userBlock.x == middle) {
-                Jump()
-                Draw()
-                RunEnemies()
-                IsCollision()
-                isSideCollision()
-                if(userBlock.y == 0 && userBlock.x % 2 == 0 &&
-                                       userBlock.color > MIN_VALUE)
-                    userBlock.color--
-                console.log("jumpLimit: ", jumpLimit)
+                MovingAfterMiddle()
             }
+            ComplexityManager()
         }
     },time)
+}
+
+function MovingBeforeMiddle() {
+    userBlock.x++
+    Jump()
+    Draw()
+    if(userBlock.x + 1 == middle)
+        GenerateEnemies()
+}
+
+function MovingAfterMiddle() {
+    Jump()
+    Draw()
+    RunEnemies()
+    IsCollision()
+    isSideCollision()
+    if(userBlock.y == 0 && userBlock.color > MIN_VALUE)
+        userBlock.color--
+}
+
+function ComplexityManager() {
+    if(distanceTraveled == 5000) {
+        numberOfEnemies += growCoef
+        console.log("numberOfEnemies: ", numberOfEnemies)
+        distanceTraveled = 0
+    } else distanceTraveled++
 }
 
 function Jump() {
@@ -81,13 +99,16 @@ function IsCollision() {
                 limitIsChanged = true
             }
             score += 0.5
-            if(userBlock.x % 2 == 0 && userBlock.color < MAX_VALUE)
+            if(userBlock.color < MAX_VALUE)
                 userBlock.color++
-            document.getElementById("scoreId").innerHTML = "" + score
-            console.log("on box")
+            DescribeScore()
         }
     }
     return isCollision
+}
+
+function DescribeScore() {
+    document.getElementById("scoreId").innerHTML = "" + score
 }
 
 function isSideCollision() {
@@ -96,7 +117,7 @@ function isSideCollision() {
            userBlock.y >= enemy.y - enemy.height + 1 &&
            userBlock.y <= enemy.y + enemy.height - 1) {
             runCounter++
-            console.log("side collision")
+            return
         }
     }
 }
@@ -132,7 +153,6 @@ function RunEnemies() {
 }
 
 function GenerateEnemies() {
-    var numberOfEnemies = 5
     var enemyCounter = 0
     while(enemyCounter < numberOfEnemies) {
         enemies.push({x: GenerateDistance(), y: 0, height: defBlockHeight})
@@ -152,16 +172,17 @@ function ClearEnemies() {
     while(enemies.length > 0) {
         enemies.pop()
     }
-    console.log(enemies.length)
 }
 
 function RestartGame() {
     score = 0
+    numberOfEnemies = MIN_ENEMIES_NUMBER
     userBlock.x = 0
     userBlock.y = 0
     userBlock.color = MIN_VALUE
     ClearEnemies()
     clearInterval(mainGameCycle)
+    DescribeScore()
     RunGame()
 }
 
@@ -174,13 +195,9 @@ document.addEventListener('keydown', function(event) {
             RunGame()
             runCounter++
         } else if(runCounter == 2) {
-            console.log()
             RestartGame()
             runCounter = 1
         } else if(userBlock.y == 0 || IsCollision())
             isJump = true
-        console.log("runCounter: ",runCounter)
-        console.log("space")
     }
-    console.log(event.which)
 })
