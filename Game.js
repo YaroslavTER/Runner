@@ -9,6 +9,7 @@ const MIN_VALUE = 71
 const MAX_VALUE = 255
 
 const MIN_ENEMIES_NUMBER = 5
+const MAX_ENEMIES_NUMBER = 20
 
 var defBlockHeight = 30
 var userBlock = {x: 0, y: 0, color: MIN_VALUE, height: defBlockHeight}
@@ -65,11 +66,13 @@ function MovingAfterMiddle() {
 }
 
 function ComplexityManager() {
-    if(distanceTraveled == 5000) {
-        numberOfEnemies += growCoef
-        console.log("numberOfEnemies: ", numberOfEnemies)
-        distanceTraveled = 0
-    } else distanceTraveled++
+    if(enemies.length < MAX_ENEMIES_NUMBER) {
+        if(distanceTraveled == 5000) {
+            AddEnemies(growCoef)
+            console.log("numberOfEnemies: ", enemies.length)
+            distanceTraveled = 0
+        } else distanceTraveled++
+    }
 }
 
 function Jump() {
@@ -154,9 +157,17 @@ function RunEnemies() {
 
 function GenerateEnemies() {
     var enemyCounter = 0
-    while(enemyCounter < numberOfEnemies) {
-        enemies.push({x: GenerateDistance(), y: 0, height: defBlockHeight})
+    while(enemyCounter < MIN_ENEMIES_NUMBER) {
+        AddEnemies(1)
         enemyCounter++
+    }
+}
+
+function AddEnemies(numberToAdd) {
+    var addCounter = 0
+    while(addCounter < numberToAdd) {
+        enemies.push({x: GenerateDistance(), y: 0, height: defBlockHeight})
+        addCounter++
     }
 }
 
@@ -176,7 +187,6 @@ function ClearEnemies() {
 
 function RestartGame() {
     score = 0
-    numberOfEnemies = MIN_ENEMIES_NUMBER
     userBlock.x = 0
     userBlock.y = 0
     userBlock.color = MIN_VALUE
