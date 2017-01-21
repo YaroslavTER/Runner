@@ -11,6 +11,9 @@ const MAX_VALUE = 255
 const MIN_ENEMIES_NUMBER = 5
 const MAX_ENEMIES_NUMBER = 20
 
+const MIN_TIME = 1
+const MAX_TIME = 6
+
 var defBlockHeight = 30
 var userBlock = {x: 0, y: 0, color: MIN_VALUE, height: defBlockHeight}
 
@@ -18,9 +21,9 @@ var jumpCoef = 2.5, isJump = false
 var jumpLimit = userBlock.height * 2 + userBlock.height / 2
 var limitIsChanged = false
 
-var time = 1
+var time = MAX_TIME
 var middle = width / 2 - userBlock.height
-var distanceTraveled = 0
+var distanceTraveled = 0, distanceTraveledToDrop = 5000
 
 var mainGameCycle
 var isBegin = false
@@ -66,12 +69,16 @@ function MovingAfterMiddle() {
 }
 
 function ComplexityManager() {
-    if(enemies.length < MAX_ENEMIES_NUMBER) {
-        if(distanceTraveled == 5000) {
+    if(distanceTraveled == distanceTraveledToDrop) {
+        if(enemies.length < MAX_ENEMIES_NUMBER) {
             AddEnemies(growCoef)
             console.log("numberOfEnemies: ", enemies.length)
-            distanceTraveled = 0
-        } else distanceTraveled++
+        }
+        distanceTraveled = 0
+    } else distanceTraveled++
+    if(time > MIN_TIME && distanceTraveled % distanceTraveledToDrop == 0) { 
+        time--
+        console.log("speedUp")
     }
 }
 
@@ -172,7 +179,10 @@ function AddEnemies(numberToAdd) {
 }
 
 function GenerateDistance() {
-    return width + defBlockHeight*GetRandInRange(minDistance, maxDistance)
+     return enemies.length == 0 ? distance = width + defBlockHeight
+                                : width + defBlockHeight*
+                                          GetRandInRange(minDistance,
+                                                         maxDistance);
 }
 
 function GetRandInRange(min, max) {
@@ -190,6 +200,8 @@ function RestartGame() {
     userBlock.x = 0
     userBlock.y = 0
     userBlock.color = MIN_VALUE
+    time = MAX_TIME
+    distanceTraveled = 0
     ClearEnemies()
     clearInterval(mainGameCycle)
     DescribeScore()
