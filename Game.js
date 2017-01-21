@@ -69,6 +69,11 @@ function MovingAfterMiddle() {
 }
 
 function ComplexityManager() {
+    if(time > MIN_TIME && (distanceTraveled == distanceTraveledToDrop/2 ||
+                           distanceTraveled == distanceTraveledToDrop)) {
+        time--
+        console.log("speedUp")
+    }
     if(distanceTraveled == distanceTraveledToDrop) {
         if(enemies.length < MAX_ENEMIES_NUMBER) {
             AddEnemies(growCoef)
@@ -76,10 +81,6 @@ function ComplexityManager() {
         }
         distanceTraveled = 0
     } else distanceTraveled++
-    if(time > MIN_TIME && distanceTraveled % distanceTraveledToDrop == 0) { 
-        time--
-        console.log("speedUp")
-    }
 }
 
 function Jump() {
